@@ -14,8 +14,10 @@ class BikeFrom extends StatefulWidget {
 }
 
 class _BikeFromState extends State<BikeFrom> {
-  final TextEditingController modelNumbercontroller=TextEditingController();
+
+  final _formKey = GlobalKey<FormState>();
   // final FirebaseFirestore _firestore=FirebaseFirestore.instance;
+  final TextEditingController modelNumbercontroller=TextEditingController();
   String dropdownvalue1 = 'TVS';
   String dropdownvalue2 = '100cc';
   String dropdownvalue3 = 'Petrol';
@@ -79,12 +81,12 @@ Future<void> saveBikeModelToFirestore(DetailsModel bikeModel) async {
     // Save data to Firestore
     await collectionRef.add(data);
     EasyLoading.dismiss();
-    Get.snackbar(
-      'Message', 'Details saved successfully',
-        backgroundColor: const Color.fromARGB(255, 63, 58, 58),
-        snackPosition: SnackPosition.TOP,
-        colorText: Colors.white,
-    );
+    // Get.snackbar(
+    //   'Message', 'Details saved successfully',
+    //     backgroundColor: const Color.fromARGB(255, 63, 58, 58),
+    //     snackPosition: SnackPosition.TOP,
+    //     colorText: Colors.white,
+    // );
     Get.offAll(()=>const ScreenOne());
   } catch (e) {
     print('Error saving data to Firestore: $e');
@@ -106,7 +108,7 @@ Future<void> saveBikeModelToFirestore(DetailsModel bikeModel) async {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Vehicale From"),
+        title: const Text("Choose Bike Prefrences"),
       ),
       body: Stack(
         children: [
@@ -119,14 +121,23 @@ Future<void> saveBikeModelToFirestore(DetailsModel bikeModel) async {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 15.0, vertical: 10),
-                        child: TextFormField(
-                          controller:modelNumbercontroller,
-                          decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.all(8.0),
-                              label: const Text("Vehicale Number"),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(50))),
-                          keyboardType: TextInputType.name,
+                        child: Form(
+                          key: _formKey,
+                          child: TextFormField(
+                            validator: (value) {
+                              if(value==null||value.isEmpty){
+                                return 'please enter bike Model numder';
+                              }
+                              return null;
+                            },
+                            controller:modelNumbercontroller,
+                            decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.all(8.0),
+                                label: const Text("Bike Model Number"),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(50))),
+                            keyboardType: TextInputType.name,
+                          ),
                         ),
                       ),
                     )
@@ -150,10 +161,13 @@ Future<void> saveBikeModelToFirestore(DetailsModel bikeModel) async {
                         value: dropdownvalue1,
                         items: <String>[
                           'TVS',
-                          'Puler',
+                          'Pulser',
                           'Hero',
                           'Honda',
-                          'KTM'
+                          'KTM',
+                          'Bajaj',
+                          'Yamaha',
+                          'Royal Enfield',
                         ].map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
@@ -195,6 +209,8 @@ Future<void> saveBikeModelToFirestore(DetailsModel bikeModel) async {
                           '140cc',
                           '150cc',
                           '250cc',
+                          '660cc',
+                          '1800cc',
                         ].map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,

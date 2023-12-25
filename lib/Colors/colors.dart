@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
 
-const Color appBarcolor=Colors.blue;
+const Color appBarcolor=Color.fromARGB(255, 2, 100, 53);
 // ignore: constant_identifier_names
-const Color ButtonColor=Colors.greenAccent;
+const Color ButtonColor=Color.fromARGB(255, 2, 100, 53);

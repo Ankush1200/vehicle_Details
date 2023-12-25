@@ -37,7 +37,7 @@ void _handleButtonClicked() {
     return Scaffold(
       appBar: AppBar(
         elevation: 1,
-        title:const Text("Vehicales Details"),
+        title:const Text("Vehicles Details"),
         bottom:  TabBar(
           indicatorColor: Colors.white,
           indicatorWeight: 2,
@@ -68,7 +68,7 @@ void _handleButtonClicked() {
                     child: ElevatedButton(onPressed:_handleButtonClicked,
                     style:ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50))
-                    ), child: const Text("Add Vehicales",
+                    ), child: const Text("Add Vehicles",
                     style: TextStyle(
                       fontSize: 18
                     ),

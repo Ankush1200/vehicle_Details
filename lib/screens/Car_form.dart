@@ -14,8 +14,9 @@ class CarFrom extends StatefulWidget {
 }
 
 class _CarFromState extends State<CarFrom> {
+  final _formkey = GlobalKey<FormState>();
   // final FirebaseFirestore _firestore=FirebaseFirestore.instance;
-  TextEditingController modelNumbercontroller=TextEditingController();
+  TextEditingController modelNumbercontroller = TextEditingController();
   String dropdownvalue1 = 'Mahindra';
   String dropdownvalue2 = 'SUV';
   String dropdownvalue3 = 'Diesel';
@@ -35,7 +36,7 @@ class _CarFromState extends State<CarFrom> {
 //         'FuelType': dropdownvalue3,
 //         // Add other fields as needed
 //       });
-  
+
 //     Get.snackbar(
 //       'Message', 'Details saved successfully',
 //         backgroundColor: const Color.fromARGB(255, 63, 58, 58),
@@ -61,40 +62,39 @@ class _CarFromState extends State<CarFrom> {
 //   }
 // }
 
-Future<void> saveCarModelToFirestore(DetailsModel bikeModel) async {
-  try {
-    EasyLoading.init();
-    EasyLoading.show(status: 'Please wait...');
-    // Access Firestore instance
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
+  Future<void> saveCarModelToFirestore(DetailsModel bikeModel) async {
+    try {
+      EasyLoading.init();
+      EasyLoading.show(status: 'Please wait...');
+      // Access Firestore instance
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-    // Add your Firestore collection reference
-    CollectionReference collectionRef = firestore.collection('CarDetails');
+      // Add your Firestore collection reference
+      CollectionReference collectionRef = firestore.collection('CarDetails');
 
-    // Convert BikeModel instance to Map
-    Map<String, dynamic> data = bikeModel.tojson();
+      // Convert BikeModel instance to Map
+      Map<String, dynamic> data = bikeModel.tojson();
 
-    // Save data to Firestore
-    await collectionRef.add(data);
-    EasyLoading.dismiss();
-    Get.snackbar(
-      'Message', 'Details saved successfully',
-        backgroundColor: const Color.fromARGB(255, 63, 58, 58),
-        snackPosition: SnackPosition.TOP,
-        colorText: Colors.white,
-    );
-    Get.offAll(()=>const ScreenOne());
-  } catch (e) {
-    print('Error saving data to Firestore: $e');
+      // Save data to Firestore
+      await collectionRef.add(data);
+      EasyLoading.dismiss();
+      // Get.snackbar(
+      //   'Message', 'Details saved successfully',
+      //     backgroundColor: const Color.fromARGB(255, 63, 58, 58),
+      //     snackPosition: SnackPosition.TOP,
+      //     colorText: Colors.white,
+      // );
+      Get.offAll(() => const ScreenOne());
+    } catch (e) {
+      print('Error saving data to Firestore: $e');
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Vehicale From"),
+        title: const Text("Choose Car Prefrences"),
       ),
       body: Stack(
         children: [
@@ -107,16 +107,26 @@ Future<void> saveCarModelToFirestore(DetailsModel bikeModel) async {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 15.0, vertical: 10),
-                        child: TextFormField(
-                          controller: modelNumbercontroller,
-                          decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.all(8.0),
-                              label: const Text("Vehiccale Number"),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(50))),
-                                  keyboardType:TextInputType.name,
+                        child: Form(
+                          key: _formkey,
+                          child: TextFormField(
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please Enter Car Model Numder';
+                              }
+                              return null;
+                            },
+                            controller: modelNumbercontroller,
+                            decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.all(8.0),
+                                label: const Text("Car Model Number"),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(50))),
+                            keyboardType: TextInputType.name,
+                          ),
                         ),
-                      
                       ),
                     )
                   ],
@@ -135,18 +145,19 @@ Future<void> saveCarModelToFirestore(DetailsModel bikeModel) async {
                       height: 50,
                       width: MediaQuery.of(context).size.width - 50,
                       child: DropdownButton<String>(
-                        
                         isExpanded: true,
                         value: dropdownvalue1,
                         items: <String>[
                           'Mahindra',
-                          'Honda',
+                          'Tata Motars',
                           'Hyundai',
-                          'Maruti Suzuki',
-                          'Toyota'
+                          'Suzuki',
+                          'Toyota',
+                          'BMW',
+                          'Frod',
+                          'Audi',
                         ].map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
-                            
                             value: value,
                             child: Text(
                               value,
@@ -182,10 +193,11 @@ Future<void> saveCarModelToFirestore(DetailsModel bikeModel) async {
                         value: dropdownvalue2,
                         items: <String>[
                           'SUV',
-                          'Van',
-                          'Boat',
-                          'Airplane',
-                          'Amblulance'
+                          'Sadan',
+                          'Coupe',
+                          'Pikup',
+                          'MiniVan',
+                          'MUV',
                         ].map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
@@ -221,7 +233,7 @@ Future<void> saveCarModelToFirestore(DetailsModel bikeModel) async {
                       child: DropdownButton<String>(
                         isExpanded: true,
                         value: dropdownvalue3,
-                        items: <String>['Diesel', 'Petrol']
+                        items: <String>['Diesel', 'Petrol', 'CNG']
                             .map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
@@ -254,7 +266,14 @@ Future<void> saveCarModelToFirestore(DetailsModel bikeModel) async {
                     const EdgeInsets.symmetric(horizontal: 10.0, vertical: 2),
                 child: ElevatedButton(
                   onPressed: () async {
-                  await saveCarModelToFirestore(DetailsModel(documentId: '', vehicalNumber:modelNumbercontroller.text.trim(), brandName: dropdownvalue1, engineType: dropdownvalue2, fuelType: dropdownvalue3));
+                    if (_formkey.currentState?.validate() == true) {
+                      await saveCarModelToFirestore(DetailsModel(
+                          documentId: '',
+                          vehicalNumber: modelNumbercontroller.text.trim(),
+                          brandName: dropdownvalue1,
+                          engineType: dropdownvalue2,
+                          fuelType: dropdownvalue3));
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(

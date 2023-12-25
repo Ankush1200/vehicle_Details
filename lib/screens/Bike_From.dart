@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -14,10 +13,9 @@ class BikeFrom extends StatefulWidget {
 }
 
 class _BikeFromState extends State<BikeFrom> {
-
   final _formKey = GlobalKey<FormState>();
   // final FirebaseFirestore _firestore=FirebaseFirestore.instance;
-  final TextEditingController modelNumbercontroller=TextEditingController();
+  final TextEditingController modelNumbercontroller = TextEditingController();
   String dropdownvalue1 = 'TVS';
   String dropdownvalue2 = '100cc';
   String dropdownvalue3 = 'Petrol';
@@ -38,7 +36,7 @@ class _BikeFromState extends State<BikeFrom> {
 //         'FuelType': dropdownvalue3,
 //         // Add other fields as needed
 //       });
-  
+
 //     Get.snackbar(
 //       'Message', 'Details saved successfully',
 //         backgroundColor: const Color.fromARGB(255, 63, 58, 58),
@@ -64,34 +62,33 @@ class _BikeFromState extends State<BikeFrom> {
 //   }
 // }
 
+  Future<void> saveBikeModelToFirestore(DetailsModel bikeModel) async {
+    try {
+      EasyLoading.init();
+      EasyLoading.show(status: 'Please wait...');
+      // Access Firestore instance
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-Future<void> saveBikeModelToFirestore(DetailsModel bikeModel) async {
-  try {
-    EasyLoading.init();
-    EasyLoading.show(status: 'Please wait...');
-    // Access Firestore instance
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
+      // Add your Firestore collection reference
+      CollectionReference collectionRef = firestore.collection('BikeDetails');
 
-    // Add your Firestore collection reference
-    CollectionReference collectionRef = firestore.collection('BikeDetails');
+      // Convert BikeModel instance to Map
+      Map<String, dynamic> data = bikeModel.tojson();
 
-    // Convert BikeModel instance to Map
-    Map<String, dynamic> data = bikeModel.tojson();
-
-    // Save data to Firestore
-    await collectionRef.add(data);
-    EasyLoading.dismiss();
-    // Get.snackbar(
-    //   'Message', 'Details saved successfully',
-    //     backgroundColor: const Color.fromARGB(255, 63, 58, 58),
-    //     snackPosition: SnackPosition.TOP,
-    //     colorText: Colors.white,
-    // );
-    Get.offAll(()=>const ScreenOne());
-  } catch (e) {
-    print('Error saving data to Firestore: $e');
+      // Save data to Firestore
+      await collectionRef.add(data);
+      EasyLoading.dismiss();
+      // Get.snackbar(
+      //   'Message', 'Details saved successfully',
+      //     backgroundColor: const Color.fromARGB(255, 63, 58, 58),
+      //     snackPosition: SnackPosition.TOP,
+      //     colorText: Colors.white,
+      // );
+      Get.offAll(() => const ScreenOne());
+    } catch (e) {
+      print('Error saving data to Firestore: $e');
+    }
   }
-}
 
 // Example of how to use the saveBikeModelToFirestore function
 // void main() async {
@@ -124,13 +121,14 @@ Future<void> saveBikeModelToFirestore(DetailsModel bikeModel) async {
                         child: Form(
                           key: _formKey,
                           child: TextFormField(
+                            autovalidateMode: AutovalidateMode.onUserInteraction,
                             validator: (value) {
-                              if(value==null||value.isEmpty){
-                                return 'please enter bike Model numder';
+                              if (value == null || value.isEmpty) {
+                                return 'Please Enter Bike Model Number';
                               }
                               return null;
                             },
-                            controller:modelNumbercontroller,
+                            controller: modelNumbercontroller,
                             decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.all(8.0),
                                 label: const Text("Bike Model Number"),
@@ -246,7 +244,7 @@ Future<void> saveBikeModelToFirestore(DetailsModel bikeModel) async {
                       child: DropdownButton<String>(
                         isExpanded: true,
                         value: dropdownvalue3,
-                        items: <String>['Petrol','Electric']
+                        items: <String>['Petrol', 'Electric']
                             .map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
@@ -278,9 +276,15 @@ Future<void> saveBikeModelToFirestore(DetailsModel bikeModel) async {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10.0, vertical: 2),
                 child: ElevatedButton(
-                  onPressed: () async{
-                   await saveBikeModelToFirestore(DetailsModel(documentId:'', vehicalNumber:modelNumbercontroller.text.trim(), brandName: dropdownvalue1, engineType: dropdownvalue2, fuelType: dropdownvalue3));
-                   
+                  onPressed: () async {
+                    if (_formKey.currentState?.validate() == true) {
+                      await saveBikeModelToFirestore(DetailsModel(
+                          documentId: '',
+                          vehicalNumber: modelNumbercontroller.text.trim(),
+                          brandName: dropdownvalue1,
+                          engineType: dropdownvalue2,
+                          fuelType: dropdownvalue3));
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
@@ -298,4 +302,3 @@ Future<void> saveBikeModelToFirestore(DetailsModel bikeModel) async {
     );
   }
 }
-
